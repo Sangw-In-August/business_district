@@ -1,0 +1,766 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>상권 분석: 최적 입지 선정 분석</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 30px;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.highlight-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+	padding: 8px;
+}
+.block-color-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.block-color-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: rgba(35, 131, 226, .07); }
+.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+.select-value-color-transparentGray { background-color: rgba(227, 226, 224, 0); }
+.select-value-color-translucentGray { background-color: rgba(0, 0, 0, 0.06); }
+.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+.select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
+.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="18ea0841-2618-8069-b37a-e7640ac32756" class="page sans"><header><h1 class="page-title">상권 분석: 최적 입지 선정 분석</h1><p class="page-description"></p><table class="properties"><tbody><tr class="property-row property-row-multi_select"><th><span class="icon property-icon"><svg aria-hidden="true" role="graphics-symbol" viewBox="0 0 16 16" style="width:14px;height:14px;display:block;fill:rgba(55, 53, 47, 0.45);flex-shrink:0" class="typesMultipleSelect"><path d="M1.91602 4.83789C2.44238 4.83789 2.87305 4.40723 2.87305 3.87402C2.87305 3.34766 2.44238 2.91699 1.91602 2.91699C1.38281 2.91699 0.952148 3.34766 0.952148 3.87402C0.952148 4.40723 1.38281 4.83789 1.91602 4.83789ZM5.1084 4.52344H14.3984C14.7607 4.52344 15.0479 4.23633 15.0479 3.87402C15.0479 3.51172 14.7607 3.22461 14.3984 3.22461H5.1084C4.74609 3.22461 4.45898 3.51172 4.45898 3.87402C4.45898 4.23633 4.74609 4.52344 5.1084 4.52344ZM1.91602 9.03516C2.44238 9.03516 2.87305 8.60449 2.87305 8.07129C2.87305 7.54492 2.44238 7.11426 1.91602 7.11426C1.38281 7.11426 0.952148 7.54492 0.952148 8.07129C0.952148 8.60449 1.38281 9.03516 1.91602 9.03516ZM5.1084 8.7207H14.3984C14.7607 8.7207 15.0479 8.43359 15.0479 8.07129C15.0479 7.70898 14.7607 7.42188 14.3984 7.42188H5.1084C4.74609 7.42188 4.45898 7.70898 4.45898 8.07129C4.45898 8.43359 4.74609 8.7207 5.1084 8.7207ZM1.91602 13.2324C2.44238 13.2324 2.87305 12.8018 2.87305 12.2686C2.87305 11.7422 2.44238 11.3115 1.91602 11.3115C1.38281 11.3115 0.952148 11.7422 0.952148 12.2686C0.952148 12.8018 1.38281 13.2324 1.91602 13.2324ZM5.1084 12.918H14.3984C14.7607 12.918 15.0479 12.6309 15.0479 12.2686C15.0479 11.9062 14.7607 11.6191 14.3984 11.6191H5.1084C4.74609 11.6191 4.45898 11.9062 4.45898 12.2686C4.45898 12.6309 4.74609 12.918 5.1084 12.918Z"></path></svg></span>Tools</th><td><span class="selected-value select-value-color-brown">Python</span><span class="selected-value select-value-color-green">Tableau</span></td></tr><tr class="property-row property-row-multi_select"><th><span class="icon property-icon"><svg aria-hidden="true" role="graphics-symbol" viewBox="0 0 16 16" style="width:14px;height:14px;display:block;fill:rgba(55, 53, 47, 0.45);flex-shrink:0" class="typesMultipleSelect"><path d="M1.91602 4.83789C2.44238 4.83789 2.87305 4.40723 2.87305 3.87402C2.87305 3.34766 2.44238 2.91699 1.91602 2.91699C1.38281 2.91699 0.952148 3.34766 0.952148 3.87402C0.952148 4.40723 1.38281 4.83789 1.91602 4.83789ZM5.1084 4.52344H14.3984C14.7607 4.52344 15.0479 4.23633 15.0479 3.87402C15.0479 3.51172 14.7607 3.22461 14.3984 3.22461H5.1084C4.74609 3.22461 4.45898 3.51172 4.45898 3.87402C4.45898 4.23633 4.74609 4.52344 5.1084 4.52344ZM1.91602 9.03516C2.44238 9.03516 2.87305 8.60449 2.87305 8.07129C2.87305 7.54492 2.44238 7.11426 1.91602 7.11426C1.38281 7.11426 0.952148 7.54492 0.952148 8.07129C0.952148 8.60449 1.38281 9.03516 1.91602 9.03516ZM5.1084 8.7207H14.3984C14.7607 8.7207 15.0479 8.43359 15.0479 8.07129C15.0479 7.70898 14.7607 7.42188 14.3984 7.42188H5.1084C4.74609 7.42188 4.45898 7.70898 4.45898 8.07129C4.45898 8.43359 4.74609 8.7207 5.1084 8.7207ZM1.91602 13.2324C2.44238 13.2324 2.87305 12.8018 2.87305 12.2686C2.87305 11.7422 2.44238 11.3115 1.91602 11.3115C1.38281 11.3115 0.952148 11.7422 0.952148 12.2686C0.952148 12.8018 1.38281 13.2324 1.91602 13.2324ZM5.1084 12.918H14.3984C14.7607 12.918 15.0479 12.6309 15.0479 12.2686C15.0479 11.9062 14.7607 11.6191 14.3984 11.6191H5.1084C4.74609 11.6191 4.45898 11.9062 4.45898 12.2686C4.45898 12.6309 4.74609 12.918 5.1084 12.918Z"></path></svg></span>데이터 출처</th><td><span class="selected-value select-value-color-brown">공공데이터포털</span></td></tr><tr class="property-row property-row-text"><th><span class="icon property-icon"><img src="https://www.notion.so/icons/link_gray.svg" style="width:14px;height:14px;display:block"/></span>코드보기 (github)</th><td><a href="https://github.com/Sangw-In-August/business_district/blob/main/%EC%84%9C%EC%9A%B8%EC%8B%9C(%EA%B0%95%EB%82%A8%EA%B5%AC)%20%EC%83%81%EA%B6%8C%20%EB%B6%84%EC%84%9D%20%EC%BD%94%EB%93%9C.ipynb">https://github.com/Sangw-In-August/business_district/blob/main/서울시(강남구) 상권 분석 코드.ipynb</a></td></tr></tbody></table></header><div class="page-body"><p id="192a0841-2618-803f-a4c5-c89346b5d45c" class="">
+</p><p id="192a0841-2618-8001-b62b-cc2ae0d8dc2b" class="">
+</p><p id="191a0841-2618-80bd-a155-da48b5678885" class=""><strong>Table of Contents</strong></p><nav id="191a0841-2618-805b-ba6e-e70a3ea307bd" class="block-color-gray_background table_of_contents"><br><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#18ea0841-2618-800f-b981-f2dc65175c24">  1. 프로젝트 개요</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#18ea0841-2618-806e-b0ad-cbfa04ca92de">1.1 프로젝트 목표</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#18ea0841-2618-803d-ae4f-d27838f93396">1.2 활용 데이터 세트</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#192a0841-2618-805d-a907-d1f213e7a636">📌 분석 내용 요약</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#192a0841-2618-80c2-9e48-d3c3ac2f5126">1️⃣ 상권 정의</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#192a0841-2618-80a4-8301-fe45f2ae638d">2️⃣ 유사한 상권 그룹화</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#192a0841-2618-80cc-8afa-d5270cec8e3b">3️⃣ 최적 입지 선정 분석</a></div> <br><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#18ea0841-2618-80bd-8c42-f9f956147fdc">  2. 상권 정의</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#190a0841-2618-803f-bb9b-f2a3b46850ef">2.1 개요</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#18ea0841-2618-80f1-aacc-dcde5883705e">2.2 클러스터링 수행 (DBSCAN)</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#190a0841-2618-8055-a153-f567d2cd637b">1) DBSCAN 알고리즘 선택 이유</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#18ea0841-2618-80b2-ad9e-c4e230355bde">2) 작업 수행 프로세스</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#18ea0841-2618-8025-8339-fa9bf9c7f26c">2.3 클러스터링 결과</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#190a0841-2618-80b9-995a-fd31c76208f7">1) 상권 클러스터링 결과 개요</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#18ea0841-2618-808e-90bb-ec5026b66190">2) 상권 시각화 결과</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#18fa0841-2618-8076-bf13-c4890fec8211">3) 상권별 업종 분포 비교</a></div><br><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#190a0841-2618-80db-b83b-fe1a866eec17">  3. 유사한 상권간 그룹화</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#190a0841-2618-806a-a919-f17582ce074b">3.1 개요</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#190a0841-2618-8032-81fd-e10beb1b2abf">3.2 방법론</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#190a0841-2618-8099-bd1d-ec903ff5fcda">3.3 계층적 클러스터링(Hierarchical Clustering) 수행</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#190a0841-2618-80c2-965f-c4241184f853">1) 계층적 클러스터링 알고리즘 선택 이유</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#191a0841-2618-80a7-98ff-cb639058ebdf">2) 작업 프로세스</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#191a0841-2618-807e-a033-e50f93401212">3) 클러스터링 결과</a></div><br><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#191a0841-2618-8002-9384-d34734f80eda">  4. 최적 입지 선정 분석</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#191a0841-2618-80fe-8cc5-c6bdad15103f">4.1 분석 목표</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#192a0841-2618-8088-8e01-e30fbcff3ee4">4.2 분석 절차</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#191a0841-2618-8066-9b05-de18e774fd08">4.3 성형외과가 많이 분포된 상권 그룹 선정 (분석 대상 상권 선정)</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#192a0841-2618-80b6-bed2-c492de41c850">4.4 상권별 경쟁도 분석</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#192a0841-2618-80af-aeae-ee5b2635378d">1) 성형외과 관련 업종 정의</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#192a0841-2618-8062-b461-ef1540219ee2">2) 성형외과 및 관련 업종 분포 시각화</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#191a0841-2618-80da-a46e-d07d2cd65aaa">3) 상권 그룹 내 관련 업종 분포 분석</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#192a0841-2618-8028-ad27-ee75d48a4840">4) 상권별 경쟁도</a></div><br><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#192a0841-2618-80bd-b709-d0f381fc6ba4">  5. 최종 결론 및 활용방안</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#192a0841-2618-803f-a62f-cd73602c170e">📌 최종 결론</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#192a0841-2618-80b1-8248-dd2e9abcf478">📌 분석 활용 방안</a></div><br></nav><p id="192a0841-2618-80a6-bf48-d9e3f06aa0d8" class="">
+</p><p id="191a0841-2618-8086-94ee-e191d1fd89f9" class="">
+</p><h1 id="18ea0841-2618-800f-b981-f2dc65175c24" class="block-color-blue_background">  1. 프로젝트 개요</h1><figure id="192a0841-2618-80ae-b228-cfd5bb4b16ac" class="image"><a href="%EC%8D%B8%EB%84%A4%EC%9D%BC_%EC%9D%B4%EB%AF%B8%EC%A7%80.jpg"><img style="width:2752px" src="images/%EC%8D%B8%EB%84%A4%EC%9D%BC_%EC%9D%B4%EB%AF%B8%EC%A7%80.jpg"/></a></figure><p id="192a0841-2618-8012-9011-da2014b00a0b" class="">
+</p><p id="192a0841-2618-80fb-899d-e4fc46bbe145" class="">
+</p><h2 id="18ea0841-2618-806e-b0ad-cbfa04ca92de" class="">1.1 프로젝트 목표</h2><p id="18ea0841-2618-80e9-888f-ec67f45b0ecf" class="">1️⃣ <strong>서울시(강남 일대)</strong> <strong>점포 위치를 기반으로 실질적인 상권을 정의</strong></p><p id="190a0841-2618-80da-b1d6-ed8fe107fb49" class="">2️⃣ <strong>유사한 특성을 가진 상권을 그룹화</strong><div class="indented"><ul id="192a0841-2618-8018-bda4-f1fa54f4e005" class="bulleted-list"><li style="list-style-type:disc">업종 구성 비율이 비슷한 상권들끼리 상권 그룹 형성</li></ul></div></p><p id="192a0841-2618-80d6-9c45-ea26124d4dde" class="">3️⃣ <strong>최적 입지 선정</strong><div class="indented"><ul id="192a0841-2618-800c-83c6-e3c6b40cc85b" class="bulleted-list"><li style="list-style-type:disc">앞서 정의된 상권을 기반으로 특정 업종(예: 성형외과)의 신규 개업을 위한 최적 입지 선정 분석 수행</li></ul><ul id="192a0841-2618-8015-8f74-d644cecc8dd2" class="bulleted-list"><li style="list-style-type:disc">상권별로 경쟁 정도를 분석하여 경쟁이 낮은 상권을 최적 입지 후보로 추출</li></ul></div></p><p id="192a0841-2618-8031-90c3-fd318fbb96e0" class="">
+</p><p id="18ea0841-2618-80e3-bf31-e067696850e4" class="">
+</p><h2 id="18ea0841-2618-803d-ae4f-d27838f93396" class="">1.2 활용 데이터 세트</h2><p id="18ea0841-2618-805f-b0b6-f4f34f55433f" class="">: <mark class="highlight-gray_background"><strong>공공데이터포털</strong></mark>에서 제공하는 소상공인 시장 진흥 공단의 상가(상권) 정보 데이터세트 (2024.09)</p><p id="18ea0841-2618-803a-8146-eb89393f656f" class=""><strong>주요 활용 변수</strong></p><ul id="18ea0841-2618-80c4-88a8-ce19122c527b" class="bulleted-list"><li style="list-style-type:disc"><mark class="highlight-gray_background"><strong>상권 업종 대·중·소분류명</strong></mark>: 업종 분류 정보</li></ul><ul id="18ea0841-2618-80b6-a24d-cec65c68edac" class="bulleted-list"><li style="list-style-type:disc"><mark class="highlight-gray_background"><strong>위도, 경도</strong></mark>: 상점 위치 정보</li></ul><p id="192a0841-2618-8092-9ab9-d87bba96654d" class="">
+</p><p id="192a0841-2618-800a-a895-c97415ed28d4" class="">
+</p><h2 id="192a0841-2618-805d-a907-d1f213e7a636" class="">📌 분석 내용 요약</h2><h3 id="192a0841-2618-80c2-9e48-d3c3ac2f5126" class="">1️⃣ 상권 정의</h3><ul id="192a0841-2618-800c-b0fa-f053cd119a11" class="bulleted-list"><li style="list-style-type:disc">서울시 강남 일대(강남구, 서초구)에서 점포의 위치 데이터를 활용하여 상권을 형성</li></ul><ul id="192a0841-2618-8065-8e9a-ff6698ed0c09" class="bulleted-list"><li style="list-style-type:disc">DBSCAN 클러스터링을 수행하여 행정구역이 아닌 실제 상업 활동을 반영한 상권 형성<p id="192a0841-2618-8032-9eb2-cdde52e5b52d" class="">⇒ 점포 밀집도를 고려하여 자연스럽게 형성된 상권 파악</p></li></ul><h3 id="192a0841-2618-80a4-8301-fe45f2ae638d" class="">2️⃣ 유사한 상권 그룹화</h3><ul id="192a0841-2618-8042-8e4a-eadd5d5fee54" class="bulleted-list"><li style="list-style-type:disc">상권별 업종 비율을 벡터화하여 유사도 측정<ul id="192a0841-2618-8039-ad3e-daa27c71298a" class="bulleted-list"><li style="list-style-type:circle">코사인 유사도 기반 계층적 클러스터링 수행</li></ul></li></ul><ul id="192a0841-2618-809f-8f6e-f90111bff37b" class="bulleted-list"><li style="list-style-type:disc">업종 조합이 유사한 상권끼리 묶어 <strong>상권 그룹</strong> 형성</li></ul><ul id="192a0841-2618-806f-94b7-fc6604aeddba" class="bulleted-list"><li style="list-style-type:disc">이를 통해 비슷한 상권 간의 비교 및 패턴 분석 가능</li></ul><h3 id="192a0841-2618-80cc-8afa-d5270cec8e3b" class="">3️⃣ 최적 입지 선정 분석</h3><ul id="192a0841-2618-804a-9b40-ef302cf7d832" class="bulleted-list"><li style="list-style-type:disc">신규 개업 점포(예시: 성형외과) 에 적합한 입지를 찾기 위해 <strong>경쟁도 분석</strong> 수행</li></ul><ul id="192a0841-2618-809f-9487-ebbd6fce3c81" class="bulleted-list"><li style="list-style-type:disc">성형외과와 관련된 업종(피부과, 약국, 피부 관리실, 화장품 소매점 등) 분포를 활용</li></ul><ul id="192a0841-2618-8053-b4ab-c0b5ccdd0405" class="bulleted-list"><li style="list-style-type:disc">개별 상권에서 경쟁도를 분석하여 최적 개업 입지 추천</li></ul><p id="18ea0841-2618-8089-8bb2-e60c45b2289b" class="">
+</p><p id="18ea0841-2618-807b-96bc-e339df90dcf0" class="">
+</p><p id="18ea0841-2618-8087-a041-ca19f33e5f4a" class="">
+</p><p id="18ea0841-2618-80a3-82df-eaf44f191898" class="">
+</p><h1 id="18ea0841-2618-80bd-8c42-f9f956147fdc" class="block-color-blue_background">  2. 상권 정의</h1><h2 id="190a0841-2618-803f-bb9b-f2a3b46850ef" class="">2.1 개요</h2><p id="190a0841-2618-803a-acac-d42a2e26b156" class="">: 서울의 강남 일대(강남구, 서초구) 점포의 위치(위도, 경도)를 기반으로 클러스터링 기법을 활용해 가까운 점포끼리 상권을 형성하고 이를 시각화 해본다. </p><p id="190a0841-2618-808c-9662-f4c781266030" class="">
+</p><p id="18ea0841-2618-8099-af12-daf6dd0bb85a" class="">
+</p><h2 id="18ea0841-2618-80f1-aacc-dcde5883705e" class="">2.2 클러스터링 수행 (DBSCAN)</h2><h3 id="190a0841-2618-8055-a153-f567d2cd637b" class=""><strong>1) DBSCAN 알고리즘 선택 이유</strong></h3><ul id="190a0841-2618-80d9-970c-dfd0fc260f73" class="bulleted-list"><li style="list-style-type:disc">DBSCAN은 밀도 기반 클러스터링 기법으로, 점포의 밀집도를 기준으로 상권을 자동으로 구분</li></ul><ul id="190a0841-2618-80f0-983f-dd4e9fc22db9" class="bulleted-list"><li style="list-style-type:disc">클러스터 개수를 사전 정의할 필요가 없음</li></ul><p id="190a0841-2618-80eb-806e-d4c19d3feb96" class="">
+</p><h3 id="18ea0841-2618-80b2-ad9e-c4e230355bde" class="">2) 작업 수행 프로세스</h3><ul id="191a0841-2618-809c-9675-f8f14502cdcb" class="bulleted-list"><li style="list-style-type:disc"><strong>데이터 전처리</strong><ul id="18ea0841-2618-8056-a037-db31d66afbd3" class="bulleted-list"><li style="list-style-type:circle">결측치 없음</li></ul><ul id="190a0841-2618-808c-990f-e73f1f90139c" class="bulleted-list"><li style="list-style-type:circle">각 점포의 위도와 경도를 이용하여 밀도 기반 클러스터링(DBSCAN) 수행</li></ul><ul id="18ea0841-2618-809f-a382-cd625c9e3ba7" class="bulleted-list"><li style="list-style-type:circle">두 지점 간 거리를 정확히 계산하기 위해 위경도간 거리는 Haversine 거리를 활용<ul id="18ea0841-2618-80c5-813d-ebec66500e6f" class="bulleted-list"><li style="list-style-type:square">Haversine 거리: 지구상에서 두 점 사이의 구면 거리를 계산하는 방식</li></ul></li></ul></li></ul><ul id="18ea0841-2618-805f-b87a-ed93dd8eca9e" class="bulleted-list"><li style="list-style-type:disc"><strong>DBSCAN 모델링</strong><ul id="191a0841-2618-8034-8e41-df63a2620231" class="bulleted-list"><li style="list-style-type:circle">파라미터 설정: <mark class="highlight-gray_background"><strong>eps = 0.000005 </strong></mark>(~약 30m 반경; 도로 4차선 거리), <mark class="highlight-gray_background"><strong>min_samples = 5</strong></mark> (최소 점포 수)설정</li></ul></li></ul><p id="191a0841-2618-80f2-b5c2-fd19f54bb52e" class="">
+</p><p id="18ea0841-2618-80b8-977b-eb7775ed0017" class="">
+</p><h2 id="18ea0841-2618-8025-8339-fa9bf9c7f26c" class="">2.3 클러스터링 결과</h2><h3 id="190a0841-2618-80b9-995a-fd31c76208f7" class="">1) 상권 클러스터링 결과 개요</h3><ul id="190a0841-2618-801a-9007-d2d5aaa1a8e4" class="bulleted-list"><li style="list-style-type:disc">전체 형성된 상권 개수: 1,624개</li></ul><ul id="190a0841-2618-80b5-b463-f643600972f0" class="bulleted-list"><li style="list-style-type:disc">상권에 포함되지 못한 독립 점포 개수: 전체 89,771개 점포 중 3,028개</li></ul><table id="190a0841-2618-80b0-b0f9-de06d3bf9dda" class="simple-table"><thead class="simple-table-header"><tr id="190a0841-2618-80f3-9ee4-c5022083da7d"><th id="e{hh" class="simple-table-header-color simple-table-header"><strong>순위</strong></th><th id="_Rqv" class="simple-table-header-color simple-table-header"><strong>상권 번호(랜덤)</strong></th><th id="Nzx{" class="simple-table-header-color simple-table-header"><strong>규모</strong></th></tr></thead><tbody><tr id="190a0841-2618-8076-90d8-c30a4a0ef746"><td id="e{hh" class="">1</td><td id="_Rqv" class="">38</td><td id="Nzx{" class="">3059</td></tr><tr id="190a0841-2618-80fb-a4d7-da997d8ce6a7"><td id="e{hh" class="">2</td><td id="_Rqv" class="">2</td><td id="Nzx{" class="">2155</td></tr><tr id="190a0841-2618-8082-8502-dded13b0ee5e"><td id="e{hh" class="">3</td><td id="_Rqv" class="">83</td><td id="Nzx{" class="">1856</td></tr><tr id="190a0841-2618-80e3-83c3-cc18213f6d1e"><td id="e{hh" class="">4</td><td id="_Rqv" class="">10</td><td id="Nzx{" class="">1834</td></tr><tr id="190a0841-2618-8085-a704-f89d42cae9ac"><td id="e{hh" class="">5</td><td id="_Rqv" class="">27</td><td id="Nzx{" class="">1830</td></tr><tr id="190a0841-2618-80b6-98f3-f64222eddf00"><td id="e{hh" class="">6</td><td id="_Rqv" class="">35</td><td id="Nzx{" class="">1392</td></tr><tr id="190a0841-2618-80dc-ba83-c000f2bec992"><td id="e{hh" class="">7</td><td id="_Rqv" class="">109</td><td id="Nzx{" class="">1053</td></tr><tr id="190a0841-2618-8039-b83d-ed77d7dd84bb"><td id="e{hh" class="">8</td><td id="_Rqv" class="">16</td><td id="Nzx{" class="">992</td></tr><tr id="190a0841-2618-8016-94f5-cd460100c06a"><td id="e{hh" class="">9</td><td id="_Rqv" class="">106</td><td id="Nzx{" class="">987</td></tr><tr id="190a0841-2618-809f-9be8-fd990464b7ef"><td id="e{hh" class="">10</td><td id="_Rqv" class="">34</td><td id="Nzx{" class="">938</td></tr><tr id="190a0841-2618-8096-8483-f182d253a6ce"><td id="e{hh" class="">…</td><td id="_Rqv" class="">…</td><td id="Nzx{" class="">…</td></tr></tbody></table><p id="190a0841-2618-8019-897a-e50edd8c9783" class="">
+</p><p id="190a0841-2618-8089-bb1f-cb6624868e11" class="">
+</p><h3 id="18ea0841-2618-808e-90bb-ec5026b66190" class="">2) 상권 시각화 결과</h3> <div class='tableauPlaceholder' id='viz1738828582259' style='position: relative'><noscript><a href='#'><img alt='상권 지도 시각화 (강남 전체)' src='https://public.tableau.com/static/images/_1/_17384913014100/sheet2/1_rss.png' style='border: none' /></a></noscript><object class='tableauViz' style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /><param name='embed_code_version' value='3' /><param name='site_root' value='' /><param name='name' value='_17384913014100/sheet2' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https://public.tableau.com/static/images/_1/_17384913014100/sheet2/1.png' /><param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='ko-KR' /></object></div><script type='text/javascript'>var divElement = document.getElementById('viz1738828582259'); var vizElement = divElement.getElementsByTagName('object')[0]; if (divElement.offsetWidth > 800) { vizElement.style.width = '100%'; vizElement.style.height = (divElement.offsetWidth * 0.75) + 'px'; } else if (divElement.offsetWidth > 500) { vizElement.style.width = '100%'; vizElement.style.height = (divElement.offsetWidth * 0.75) + 'px'; } else { vizElement.style.width = '100%'; vizElement.style.height = '727px'; } var scriptElement = document.createElement('script'); scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js'; vizElement.parentNode.insertBefore(scriptElement, vizElement);</script>
+<h3 id="18fa0841-2618-8076-bf13-c4890fec8211" class="">3) 상권별 업종 분포 비교</h3><p id="18fa0841-2618-8012-ac64-cba21ed46d7a" class=""><strong>3.1) 비교 대상 상권</strong></p><ul id="18fa0841-2618-804d-965a-dc65f06e9627" class="bulleted-list"><li style="list-style-type:disc">강남, 서초구 전체</li></ul><ul id="190a0841-2618-8006-94d9-fdd20ac702d5" class="bulleted-list"><li style="list-style-type:disc">논현역 ~ 신논현역 상권</li></ul><ul id="18fa0841-2618-808c-9978-cc21f9989777" class="bulleted-list"><li style="list-style-type:disc">대치동 학원가 주변</li></ul><ul id="18fa0841-2618-80c5-86c9-d8a8b17c84ce" class="bulleted-list"><li style="list-style-type:disc">서초역 주변 일대</li></ul><ul id="18fa0841-2618-8051-a863-c4a6d6a7a123" class="bulleted-list"><li style="list-style-type:disc">압구정 로데오역 주변 일대</li></ul><p id="192a0841-2618-807b-bdcc-c0146735501f" class="">
+</p><p id="190a0841-2618-8020-bf01-fbf94d9c25b7" class="">
+</p><p id="190a0841-2618-80f5-85d1-d1d3b762a834" class=""><strong>3.2) 업종 분포 비교 (상위 10개 업종)</strong></p><figure id="190a0841-2618-80c8-aa6e-d1091f6d055c" class="image"><a href="image.png"><img style="width:709.984375px" src="images/image.png"/></a></figure><figure id="190a0841-2618-80a4-b8d3-cbbf032d573a" class="image"><a href="image%201.png"><img style="width:709.984375px" src="images/image%201.png"/></a></figure><figure id="190a0841-2618-80c4-8078-e0e2be5dd678" class="image"><a href="image%202.png"><img style="width:709.984375px" src="images/image%202.png"/></a></figure><figure id="190a0841-2618-8046-aac5-d369bbb21fbc" class="image"><a href="image%203.png"><img style="width:709.96875px" src="images/image%203.png"/></a></figure><figure id="190a0841-2618-8093-9eda-e0989aa76ed9" class="image"><a href="image%204.png"><img style="width:709.984375px" src="images/image%204.png"/></a></figure><p id="190a0841-2618-80c6-adb2-e717df12ad3b" class="">
+</p><p id="190a0841-2618-8009-8ff6-e142df36a523" class="">
+</p><p id="190a0841-2618-8019-93a5-fa51e9a6ffd3" class="">강남의 대표적인 5개 상권에 대하여 업종 분포를 비교해 본 결과, 상권별 특색이 잘 드러나게끔 클러스터링이 이루어졌음을 확인<div class="indented"><ul id="190a0841-2618-80a8-b88f-db8c040dfbb4" class="bulleted-list"><li style="list-style-type:disc">논현 ~ 신논현 역 사이 상권에는 경영 컨설팅업, 광고 대행업 등의 비중이 가장 높으며, 다양한 업종들이 골고루 분포</li></ul><ul id="190a0841-2618-8009-9555-f9ec52395c71" class="bulleted-list"><li style="list-style-type:disc">대치동 학원가의 경우 교육시설 분포가 압도적으로 높음</li></ul><ul id="190a0841-2618-8094-a1ad-f48a3e85fca1" class="bulleted-list"><li style="list-style-type:disc">서초역 인근은 주요 사법 시설들이 밀집한 이유로 변호사 사무실이 많이 분포</li></ul><ul id="190a0841-2618-807d-ad8a-e2ba1c142605" class="bulleted-list"><li style="list-style-type:disc">압구정로데오역 인근은 주점 등 다양한 업종들이 골고루 분포하고 있음</li></ul></div></p><p id="190a0841-2618-8048-8192-d5acf9279414" class="">
+</p><p id="190a0841-2618-802f-90d9-fa1c0391138d" class="">
+</p><p id="190a0841-2618-8040-9f13-dc72df0462b8" class="">
+</p><p id="190a0841-2618-8062-b010-d3ca76f14afb" class="">
+</p><h1 id="190a0841-2618-80db-b83b-fe1a866eec17" class="block-color-blue_background">  3. 유사한 상권간 그룹화</h1><h2 id="190a0841-2618-806a-a919-f17582ce074b" class="">3.1 개요</h2><p id="190a0841-2618-804d-8500-cfff8e6daa64" class="">: 상권들 간에 업종 비율이 유사한 정도를 측정하고, 성격이 유사한 상권간 그룹화하여 이를 비교해본다.</p><p id="190a0841-2618-8004-9e16-fc055ab900f2" class="">
+</p><p id="190a0841-2618-803f-a56a-f03a9bd28b7a" class="">
+</p><h2 id="190a0841-2618-8032-81fd-e10beb1b2abf" class="">3.2 방법론</h2><ol type="1" id="190a0841-2618-803e-9183-c3ff478be0fc" class="numbered-list" start="1"><li>각 상권별 업종(대분류, 중분류, 소분류)의 구성 비율을 계산<ul id="190a0841-2618-8047-88ce-ef6cbe8f38d1" class="bulleted-list"><li style="list-style-type:disc">데이터세트 결과 예시<table id="190a0841-2618-8021-9fae-c930dc3ede64" class="simple-table"><thead class="simple-table-header"><tr id="190a0841-2618-80a9-a41d-f0e2b2a6e876"><th id="Z`zN" class="simple-table-header-color simple-table-header"><strong>상권</strong></th><th id="BT[?" class="simple-table-header-color simple-table-header"><strong>대_교육</strong></th><th id="tUO@" class="simple-table-header-color simple-table-header"><strong>대_보건의료</strong></th><th id="BUd{" class="simple-table-header-color simple-table-header" style="width:133px"><strong>중_가전·통신 소매</strong></th><th id="_Spc" class="simple-table-header-color simple-table-header" style="width:138px"><strong>중_가전제품 수리</strong></th><th id="jMK]" class="simple-table-header-color simple-table-header"><strong>소_가구 소매업</strong></th><th id="]cXo" class="simple-table-header-color simple-table-header"><strong>소_가발 소매업</strong></th></tr></thead><tbody><tr id="190a0841-2618-80bc-9db8-e9202c96c021"><td id="Z`zN" class="">1</td><td id="BT[?" class="">6.5%</td><td id="tUO@" class="">2.3%</td><td id="BUd{" class="" style="width:133px">0.8%</td><td id="_Spc" class="" style="width:138px">0.4%</td><td id="jMK]" class="">0.0%</td><td id="]cXo" class="">0.0%</td></tr><tr id="190a0841-2618-80a0-b168-d0bd8ed432b2"><td id="Z`zN" class="">2</td><td id="BT[?" class="">3.8%</td><td id="tUO@" class="">0.0%</td><td id="BUd{" class="" style="width:133px">0.0%</td><td id="_Spc" class="" style="width:138px">0.0%</td><td id="jMK]" class="">0.0%</td><td id="]cXo" class="">0.0%</td></tr><tr id="190a0841-2618-80eb-a8d0-fa9b2d7218fc"><td id="Z`zN" class="">3</td><td id="BT[?" class="">2.8%</td><td id="tUO@" class="">0.7%</td><td id="BUd{" class="" style="width:133px">0.4%</td><td id="_Spc" class="" style="width:138px">0.1%</td><td id="jMK]" class="">0.1%</td><td id="]cXo" class="">0.0%</td></tr><tr id="190a0841-2618-80ff-8b46-fa950029d044"><td id="Z`zN" class="">4</td><td id="BT[?" class="">4.3%</td><td id="tUO@" class="">0.9%</td><td id="BUd{" class="" style="width:133px">0.6%</td><td id="_Spc" class="" style="width:138px">0.2%</td><td id="jMK]" class="">0.4%</td><td id="]cXo" class="">0.0%</td></tr></tbody></table></li></ul></li></ol><ol type="1" id="190a0841-2618-8024-93b2-ec21a149c051" class="numbered-list" start="2"><li>코사인 거리를 기반으로 상권간 코사인 유사도 계산</li></ol><ol type="1" id="190a0841-2618-8080-be25-ea43a0e0f7f2" class="numbered-list" start="3"><li>이를 이용하여 유사한 상권끼리 그룹화<ul id="190a0841-2618-80b2-b48c-e833dc2aeb82" class="bulleted-list"><li style="list-style-type:disc">활용한 클러스터링 기법: <em><strong>계층적 클러스터링(Hierarchical Clustering)</strong></em></li></ul></li></ol><p id="190a0841-2618-806c-9566-e921724a67b4" class="">
+</p><p id="190a0841-2618-8007-a645-d148614d5f82" class="">
+</p><p id="190a0841-2618-8097-9582-d3a270e43782" class="">
+</p><h2 id="190a0841-2618-8099-bd1d-ec903ff5fcda" class="">3.3 계층적 클러스터링(Hierarchical Clustering) 수행</h2><h3 id="190a0841-2618-80c2-965f-c4241184f853" class=""><strong>1) 계층적 클러스터링 알고리즘 선택 이유</strong></h3><ul id="190a0841-2618-809c-83bd-d7f3aea4ccda" class="bulleted-list"><li style="list-style-type:disc">군집 개수를 사전에 정할 필요가 없음</li></ul><ul id="190a0841-2618-808e-bdfb-e20ab8bf667a" class="bulleted-list"><li style="list-style-type:disc">유사도가 높은 순서대로 군집을 형성하는 방식이기 때문에 앞서 계산된 코사인 유사도를 자연스럽게 반영 가능</li></ul><p id="190a0841-2618-80c1-b225-ee1e256951e8" class="">
+</p><p id="191a0841-2618-80ab-954a-d53554951943" class="">
+</p><h3 id="191a0841-2618-80a7-98ff-cb639058ebdf" class="">2) 작업 프로세스</h3><ol type="1" id="190a0841-2618-807c-a0c9-da7e8fe2e3a3" class="numbered-list" start="1"><li>먼저 모든 상권에 대해 <em><strong>업종별 구성 비율</strong></em>을 기반으로 코사인 유사도를 계산</li></ol><ol type="1" id="190a0841-2618-80bf-a4f2-f3bf20925dec" class="numbered-list" start="2"><li>거리 행렬을 (1 - 코사인 유사도) 로 변환하여 클러스터링 수행</li></ol><ol type="1" id="190a0841-2618-8085-836d-e0cfbee78092" class="numbered-list" start="3"><li><mark class="highlight-gray_background"><strong>linkage=’average’</strong></mark><mark class="highlight-default_background">, </mark><mark class="highlight-gray_background"><strong>distance_threshold=0.3</strong></mark><mark class="highlight-default_background">    </mark><em><mark class="highlight-default_background">← (1 - 0.7)</mark></em><mark class="highlight-default_background"><br/>⇒ 그룹 내 상권 간 유사도 평균이 0.7 이상이 되도록 설정<br/></mark></li></ol><p id="190a0841-2618-8097-abb0-de13b6d3f197" class="">
+</p><p id="191a0841-2618-806b-bc98-e4174b3edd64" class="">
+</p><h3 id="191a0841-2618-807e-a033-e50f93401212" class="">3) 클러스터링 결과</h3><p id="190a0841-2618-8072-954d-ca424085f58f" class=""><strong>3.1) 상권 그룹별 기초 통계량</strong><div class="indented"><ul id="190a0841-2618-8002-9f20-e4ee607c60ac" class="bulleted-list"><li style="list-style-type:disc">전체 상권 그룹 개수: 351개</li></ul><ul id="190a0841-2618-80ea-95c2-db76457d7881" class="bulleted-list"><li style="list-style-type:disc">각 그룹별 유사도 평균 (표준편차): 0.93 (0.08)</li></ul><ul id="190a0841-2618-80a9-8eff-f950f2b289f0" class="bulleted-list"><li style="list-style-type:disc">최소 유사도: 0.76</li></ul><ul id="190a0841-2618-802d-ba20-c2c0f902d2ef" class="bulleted-list"><li style="list-style-type:disc">상권 그룹별 규모, 유사도 요약<table id="191a0841-2618-80b8-81c8-fd5e3d46af2d" class="simple-table"><thead class="simple-table-header"><tr id="191a0841-2618-801a-82d8-c6b9823e87a6"><th id="e]C^" class="simple-table-header-color simple-table-header"><strong>상권 그룹 No</strong></th><th id="DlRb" class="simple-table-header-color simple-table-header"><strong>포함된 상권 수</strong></th><th id="Z?CO" class="simple-table-header-color simple-table-header"><strong>점포 수</strong></th><th id="iTto" class="simple-table-header-color simple-table-header"><strong>평균 유사도</strong></th></tr></thead><tbody><tr id="191a0841-2618-80b1-9742-e2e6e7410e98"><td id="e]C^" class="">34</td><td id="DlRb" class="">171</td><td id="Z?CO" class="">37,753</td><td id="iTto" class="">0.79</td></tr><tr id="191a0841-2618-80e7-bbc2-deb4c3096280"><td id="e]C^" class="">42</td><td id="DlRb" class="">246</td><td id="Z?CO" class="">15,728</td><td id="iTto" class="">0.78</td></tr><tr id="191a0841-2618-809f-9e84-e13285f5e6c2"><td id="e]C^" class="">66</td><td id="DlRb" class="">48</td><td id="Z?CO" class="">6,956</td><td id="iTto" class="">0.85</td></tr><tr id="191a0841-2618-80dd-8a1a-da75144cfd22"><td id="e]C^" class="">5</td><td id="DlRb" class="">43</td><td id="Z?CO" class="">2,624</td><td id="iTto" class="">0.78</td></tr><tr id="191a0841-2618-80f6-b182-c867e0c94ce9"><td id="e]C^" class="">10</td><td id="DlRb" class="">71</td><td id="Z?CO" class="">2,555</td><td id="iTto" class="">0.77</td></tr><tr id="191a0841-2618-80f8-9a19-d9030ef9923e"><td id="e]C^" class="">94</td><td id="DlRb" class="">17</td><td id="Z?CO" class="">2,152</td><td id="iTto" class="">0.89</td></tr><tr id="191a0841-2618-80d7-88cd-db070371b6fd"><td id="e]C^" class="">59</td><td id="DlRb" class="">61</td><td id="Z?CO" class="">1,843</td><td id="iTto" class="">0.8</td></tr><tr id="191a0841-2618-80f7-9a57-c99cde87fa6e"><td id="e]C^" class="">…</td><td id="DlRb" class=""></td><td id="Z?CO" class="">…</td><td id="iTto" class=""></td></tr><tr id="191a0841-2618-80e9-b1d6-c30a1ff448c9"><td id="e]C^" class="">315</td><td id="DlRb" class="">1</td><td id="Z?CO" class="">5</td><td id="iTto" class="">1.0</td></tr><tr id="191a0841-2618-809c-a9a8-f8c1595a251a"><td id="e]C^" class="">111</td><td id="DlRb" class="">1</td><td id="Z?CO" class="">5</td><td id="iTto" class="">1.0</td></tr><tr id="191a0841-2618-8078-8c31-c2b5bacab6fb"><td id="e]C^" class="">240</td><td id="DlRb" class="">1</td><td id="Z?CO" class="">4</td><td id="iTto" class="">1.0</td></tr><tr id="191a0841-2618-80f4-a207-c11d3c99984a"><td id="e]C^" class="">135</td><td id="DlRb" class="">1</td><td id="Z?CO" class="">4</td><td id="iTto" class="">1.0</td></tr><tr id="191a0841-2618-8010-ae58-f9c699dd12e1"><td id="e]C^" class="">187</td><td id="DlRb" class="">1</td><td id="Z?CO" class="">3</td><td id="iTto" class="">1.0</td></tr></tbody></table></li></ul></div></p><p id="190a0841-2618-80c6-9604-e67df4feeabb" class="">
+</p><p id="190a0841-2618-8063-948f-c642799615d5" class=""><strong>3.2) 주요 상권 그룹 시각화</strong></p><ul id="191a0841-2618-801e-bb42-eea542efcfaf" class="bulleted-list"><li style="list-style-type:disc"><strong>상권 그룹 No. 10: 교육 시설 비율이 높음</strong></li></ul><figure id="191a0841-2618-804e-9d4c-df46cf45335f" class="image"><a href="image%205.png"><img style="width:709.96875px" src="images/image%205.png"/></a></figure><figure id="191a0841-2618-8089-b2cc-ec37e6c06109" class="image"><a href="image%206.png"><img style="width:709.984375px" src="images/image%206.png"/></a></figure><p id="191a0841-2618-8042-a6c3-d146b975fc40" class="">
+</p><p id="191a0841-2618-80fc-a30f-f028deffd222" class="">
+</p><ul id="191a0841-2618-8081-90ad-e35c0a3f6cd9" class="bulleted-list"><li style="list-style-type:disc"><strong>상권 그룹 No. 41: 카페 비율이 높음</strong></li></ul><figure id="191a0841-2618-80e8-90cd-c8462ae924a5" class="image"><a href="image%207.png"><img style="width:709.96875px" src="images/image%207.png"/></a></figure><figure id="191a0841-2618-8079-8cfd-da5a1b9c8f05" class="image"><a href="image%208.png"><img style="width:709.96875px" src="images/image%208.png"/></a></figure><p id="191a0841-2618-80e3-9cf2-d2fe6ee98154" class="">
+</p><p id="191a0841-2618-80c7-951a-ef9b23b01d88" class="">
+</p><ul id="191a0841-2618-80d5-af1d-cb25b4854a4e" class="bulleted-list"><li style="list-style-type:disc"><strong>상권 그룹 No. 34: 그룹의 규모가 가장 큼</strong><ul id="191a0841-2618-80ee-af3b-d4d952e61a9b" class="bulleted-list"><li style="list-style-type:circle">역삼역, 강남역 일대, 논현역 일대, 압구정 로데오 등 대규모 상권이 여기에 속함</li></ul><ul id="191a0841-2618-801a-9f23-c9204ac4b363" class="bulleted-list"><li style="list-style-type:circle">다양한 업종들이 포진해있음</li></ul></li></ul><figure id="191a0841-2618-806c-b69b-cdf01f605ab5" class="image"><a href="image%209.png"><img style="width:709.984375px" src="images/image%209.png"/></a></figure><figure id="191a0841-2618-8065-bc82-ef674bcfb87f" class="image"><a href="image%2010.png"><img style="width:709.984375px" src="images/image%2010.png"/></a></figure><p id="191a0841-2618-8040-9b61-ea705eb61ba2" class="">
+</p><p id="191a0841-2618-80e9-b078-dfe4ef89cf94" class="">
+</p><p id="191a0841-2618-80dd-98f3-dc2a6ae1299f" class="">
+</p><p id="191a0841-2618-80be-9256-f60da0f4f78d" class="">
+</p><h1 id="191a0841-2618-8002-9384-d34734f80eda" class="block-color-blue_background">  4. 최적 입지 선정 분석</h1><h2 id="191a0841-2618-80fe-8cc5-c6bdad15103f" class="">4.1 분석 목표</h2><p id="191a0841-2618-80bc-b777-e0fd87695499" class="">📌 <strong>성형외과를 개업하기에 가장 유리한 입지 찾기</strong><div class="indented"><ul id="192a0841-2618-80a3-92cf-ed6361cbf7fb" class="bulleted-list"><li style="list-style-type:disc">관련 업종(미용, 피부, 성형 관련) 비율은 높은데 성형외과가 적은 상권 그룹을 탐색한다.</li></ul><ul id="192a0841-2618-8086-b8d4-d78a4652ef48" class="bulleted-list"><li style="list-style-type:disc">이를 통해 신규 개업 시 수요 대비 경쟁이 낮은 지역을 추천한다.</li></ul></div></p><p id="192a0841-2618-807e-bfbd-f1c4caf1a419" class="">
+</p><p id="192a0841-2618-8090-a305-d7e9c9155de3" class="">
+</p><p id="192a0841-2618-8045-8207-d5e6c3623dfe" class="">
+</p><h2 id="192a0841-2618-8088-8e01-e30fbcff3ee4" class="">4.2 분석 절차</h2><p id="192a0841-2618-80da-9bc3-fef260d62455" class="">1️⃣ <strong>STEP 1: 성형외과가 많이 분포된 상권 그룹 선정 (분석 대상 상권 선정)</strong></p><p id="192a0841-2618-8037-8823-fba28b8eca63" class="">2️⃣ <strong>STEP 2: 해당 상권 그룹 내 상권별 경쟁도를 분석하여 최적 개업 입지 탐색</strong><div class="indented"><ul id="192a0841-2618-8083-abe7-f24588fa98c4" class="bulleted-list"><li style="list-style-type:disc">성형외과와 관련된 업종 정의</li></ul><ul id="192a0841-2618-80ac-9f83-d4a6827f8bc6" class="bulleted-list"><li style="list-style-type:disc">경쟁도는 성형외과와 관련된 업종 대비 성형외과의 분포 비율로 계산<figure id="192a0841-2618-80dd-8584-e5aff8376362" class="equation"><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><div class="equation-container"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>경쟁도</mtext><mo>=</mo><mfrac><mrow><mtext>성형외과</mtext><mtext> </mtext><mtext>분포</mtext><mtext> </mtext><mtext>비율</mtext></mrow><mrow><mtext>관련</mtext><mtext> </mtext><mtext>업종</mtext><mtext> </mtext><mtext>분포</mtext><mtext> </mtext><mtext>비율</mtext></mrow></mfrac></mrow><annotation encoding="application/x-tex">경쟁도 = \frac{성형외과\,분포\,비율}{관련\,업종\,분포\,비율}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord hangul_fallback">경쟁도</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord hangul_fallback">관련</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord hangul_fallback">업종</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord hangul_fallback">분포</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord hangul_fallback">비율</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord hangul_fallback">성형외과</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord hangul_fallback">분포</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord hangul_fallback">비율</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></div></figure><ul id="192a0841-2618-80fa-bfcf-f4b5dc3735cb" class="bulleted-list"><li style="list-style-type:circle">성형외과 관련 업종 비율은 높으나 성형외과의 비율이 낮으면 경쟁도는 낮음</li></ul></li></ul></div></p><p id="192a0841-2618-80cf-b81a-d5fa580c5ad9" class="">
+</p><p id="191a0841-2618-8000-8341-db108de17507" class="">
+</p><p id="192a0841-2618-80be-8afe-c98fdab9bd04" class="">
+</p><p id="191a0841-2618-8012-b30c-fa9aa82a6e9b" class="">
+</p><h2 id="191a0841-2618-8066-9b05-de18e774fd08" class="">4.3 <strong>성형외과가 많이 분포된 상권 그룹 선정 (분석 대상 상권 선정)</strong></h2><figure id="192a0841-2618-801d-aa4d-e86901946ea1" class="image"><a href="image%2011.png"><img style="width:709.96875px" src="images/image%2011.png"/></a></figure><p id="192a0841-2618-80f1-a066-c7aaeacf5102" class="">
+</p><ul id="192a0841-2618-80e5-8ac7-cef7089263cb" class="bulleted-list"><li style="list-style-type:disc">서울시 강남권의 대다수 성형외과는 <em><strong>상권 그룹 34, 4, 42,32, 158, 66 </strong></em>에 분포함</li></ul><ul id="192a0841-2618-8063-93cf-c778b4624983" class="bulleted-list"><li style="list-style-type:disc">이들 상권 그룹에 포함된 상권만을 대상으로 경쟁 정도를 분석해서 최적 개업 입지를 도출할 예정</li></ul><p id="192a0841-2618-80d6-b72b-f50147891ee3" class="">
+</p><p id="192a0841-2618-8036-8248-f2312247317e" class="">
+</p><p id="192a0841-2618-8012-975d-e6443facb065" class="">
+</p><h2 id="192a0841-2618-80b6-bed2-c492de41c850" class="">4.4 <strong>상권별 경쟁도 분석</strong></h2><h3 id="192a0841-2618-80af-aeae-ee5b2635378d" class="">1) 성형외과 관련 업종 정의</h3><p id="192a0841-2618-80af-bb90-c33752bd7d14" class="">📍 <strong>성형외과 의원, 화장품 소매업, 피부 관리실, 약국, 피부/비뇨기과 의원</strong><div class="indented"><ul id="192a0841-2618-80a0-a1fd-d58ebe7830e0" class="bulleted-list"><li style="list-style-type:disc">이들은 모두 미용, 피부, 성형 과 직·간접적으로 관련이 되어 있다고 판단</li></ul><ul id="192a0841-2618-808b-af68-f0bea2a6a519" class="bulleted-list"><li style="list-style-type:disc">관련 업종은 전문가의 의견을 반영하거나, 업종간 연관 정도 분석을 통해 더 정확하게 정의할 수 있음</li></ul></div></p><p id="192a0841-2618-806c-96f6-d5da30aa7eb8" class="">
+</p><p id="192a0841-2618-8049-96de-ecebbc09ed4d" class="">
+</p><h3 id="192a0841-2618-8062-b461-ef1540219ee2" class="">2) 성형외과 및 관련 업종 분포 시각화</h3><figure id="192a0841-2618-80fb-afc9-c42e372a1926" class="image"><a href="image%2012.png"><img style="width:709.96875px" src="images/image%2012.png"/></a></figure><p id="192a0841-2618-80c9-acd0-e5eb579ddbdd" class="">: 강남대로와 압구정 지역 일대에 대다수의 성형외과가 포진<div class="indented"><p id="192a0841-2618-8011-b798-d4b2a4f23d24" class="">⇒ 이러한 대규모 밀집 상권은 경쟁이 매우 치열하고 상가 임대료 또한 매우 높을 것으로 예상</p><p id="192a0841-2618-8076-8442-d75cfb7df809" class="">
+</p></div></p><p id="192a0841-2618-80f3-b7c9-e97375579f70" class="">
+</p><p id="192a0841-2618-80db-ad9b-dc540b8f0edf" class="">
+</p><h3 id="191a0841-2618-80da-a46e-d07d2cd65aaa" class="">3) 상권 그룹 내 관련 업종 분포 분석</h3><p id="192a0841-2618-80a7-b6a9-fcd212e0bd34" class=""><strong>상권 그룹별 분포 요약</strong></p><table id="192a0841-2618-80b7-96b4-e779da73647d" class="simple-table"><thead class="simple-table-header"><tr id="192a0841-2618-80ae-8fa5-eb79d471017c"><th id="GiJk" class="simple-table-header-color simple-table-header"><strong>상권그룹 No</strong></th><th id="ihSk" class="simple-table-header-color simple-table-header"><strong>그룹 내 상권 개수</strong></th><th id="GWV`" class="simple-table-header-color simple-table-header"><strong>전체 점포수</strong></th><th id="JCfE" class="simple-table-header-color simple-table-header"><strong>성형외과 관련업종 점포수</strong></th><th id="`Ynq" class="simple-table-header-color simple-table-header"><strong>성형외과 점포 수</strong></th></tr></thead><tbody><tr id="192a0841-2618-80fb-a8a4-c29c44eea391"><td id="GiJk" class="">4</td><td id="ihSk" class="">26</td><td id="GWV`" class="">961</td><td id="JCfE" class="">312</td><td id="`Ynq" class="">148</td></tr><tr id="192a0841-2618-8021-8888-f54e3200a173"><td id="GiJk" class="">32</td><td id="ihSk" class="">8</td><td id="GWV`" class="">438</td><td id="JCfE" class="">106</td><td id="`Ynq" class="">45</td></tr><tr id="192a0841-2618-80c8-91a2-d9d15c2260c4"><td id="GiJk" class="">34</td><td id="ihSk" class="">171</td><td id="GWV`" class="">37,753</td><td id="JCfE" class="">1,973</td><td id="`Ynq" class="">319</td></tr><tr id="192a0841-2618-80f9-8dbd-fd7103fd3a4f"><td id="GiJk" class="">42</td><td id="ihSk" class="">246</td><td id="GWV`" class="">15,728</td><td id="JCfE" class="">481</td><td id="`Ynq" class="">56</td></tr><tr id="192a0841-2618-805e-9cee-ef3b743289be"><td id="GiJk" class="">66</td><td id="ihSk" class="">48</td><td id="GWV`" class="">6,956</td><td id="JCfE" class="">116</td><td id="`Ynq" class="">7</td></tr><tr id="192a0841-2618-8064-b04e-f5edbdeab4d3"><td id="GiJk" class="">158</td><td id="ihSk" class="">8</td><td id="GWV`" class="">511</td><td id="JCfE" class="">81</td><td id="`Ynq" class="">33</td></tr></tbody></table><p id="192a0841-2618-8077-aecc-c9cdae13f152" class="">
+</p><p id="192a0841-2618-807b-9015-f575180b8afe" class="">
+</p><p id="192a0841-2618-8018-bb96-ea8095ca17ce" class="">
+</p><h3 id="192a0841-2618-8028-ad27-ee75d48a4840" class="">4) 상권별 경쟁도</h3><p id="192a0841-2618-80a0-834a-d134b3d5594c" class=""> - 성형외과 관련업종 점포 수가 20개 이상인 상권만 필터링하였음</p><figure id="192a0841-2618-8086-b3e3-e90d4431b2bb" class="image" style="text-align:left"><a href="image%2013.png"><img style="width:480px" src="images/image%2013.png"/></a></figure><p id="192a0841-2618-80cf-9279-e0363bfe4220" class="">
+</p><p id="192a0841-2618-809f-aa2f-e60cd46d09f7" class="">💡 <strong>경쟁도가 낮을수록 성형외과 관련 업종 비율은 높지만 성형외과는 부족한 상권을 의미!!</strong></p><p id="192a0841-2618-80ea-b208-d4bf9f856c2c" class="">
+</p><p id="192a0841-2618-800e-82be-eb6d6f496816" class="">
+</p><p id="192a0841-2618-805b-a382-d75507ad919b" class="">📌 <strong>지도로 시각화</strong></p><figure id="192a0841-2618-80e8-8109-e9b37f97c06c" class="image"><a href="image%2014.png"><img style="width:709.984375px" src="images/image%2014.png"/></a></figure><p id="192a0841-2618-80b8-9475-ed88c11a4728" class="">
+</p><p id="192a0841-2618-8027-8c96-e1a2c4b540ef" class="">
+</p><p id="192a0841-2618-8061-b1a6-fd9dc9b60a26" class="">
+</p><p id="192a0841-2618-80a8-b0db-db0f46e1746f" class="">
+</p><p id="192a0841-2618-8032-b171-f4d1fc1200b7" class="">
+</p><p id="192a0841-2618-808b-91bc-eb4ed68448e9" class="">
+</p><p id="192a0841-2618-804b-94c6-fcf6388aa962" class="">
+</p><h1 id="192a0841-2618-80bd-b709-d0f381fc6ba4" class="block-color-blue_background">  5. 최종 결론 및 활용방안</h1><h2 id="192a0841-2618-803f-a62f-cd73602c170e" class=""><strong>📌 최종 결론</strong></h2><p id="192a0841-2618-806a-8ae3-e562ce6cb5fb" class="">✔ <strong>서울 강남 일대의 점포 데이터를 활용하여 위치 기반 클러스터링을 수행하고, 상권을 정의</strong></p><p id="192a0841-2618-805c-a023-eb72211cc75c" class="">✔ <strong>유사한 업종 분포를 가진 상권끼리 그룹화하여 상권 그룹을 형성</strong></p><p id="192a0841-2618-8001-9647-f55e97fe4ac6" class="">✔ <strong>각 상권 그룹 내에서 성형외과 개업에 적합한 지역을 찾기 위해 경쟁도를 분석</strong></p><p id="192a0841-2618-804c-8b0c-ffebb934b90d" class="">✔ <strong>최종적으로 경쟁이 낮고 관련 업종이 많은 상권을 추천하여 최적 개업 입지를 선정</strong></p><p id="192a0841-2618-8068-a249-d73aa5da14e9" class="">
+</p><p id="192a0841-2618-8083-b4f0-c507ec42209d" class="">
+</p><h2 id="192a0841-2618-80b1-8248-dd2e9abcf478" class="">📌 분석 활용 방안</h2><p id="192a0841-2618-80da-928e-de31e62cbc42" class="">✅ <strong>창업자 (신규 점포 개업자)</strong><div class="indented"><ul id="192a0841-2618-8030-a0ad-f00539b65995" class="bulleted-list"><li style="list-style-type:disc">점포 개업시, 경쟁이 적고 관련 업종이 풍부한 상권을 탐색 가능</li></ul><ul id="192a0841-2618-80bb-b247-c19278de2e10" class="bulleted-list"><li style="list-style-type:disc">개업하고자 하는 업종이 부족한 유망 지역을 선별하여 신규 입지 결정에 활용</li></ul></div></p><p id="192a0841-2618-8066-9959-c95796046092" class="">
+</p><p id="192a0841-2618-801f-869f-f574a2821d89" class="">✅ <strong>투자자 및 부동산 개발업자</strong><div class="indented"><ul id="192a0841-2618-8036-ba02-f17bb8bd9a05" class="bulleted-list"><li style="list-style-type:disc">타겟 업종과의 시너지가 기대되는 지역을 선정하여 부동산 투자 기회 모색 가능</li></ul><ul id="192a0841-2618-8073-ae19-db0e13124eb6" class="bulleted-list"><li style="list-style-type:disc">상업용 부동산에서 유망 상권을 사전에 식별하여 투자 가치 분석</li></ul></div></p><p id="192a0841-2618-8034-a2f5-d897981def56" class="">
+</p><p id="192a0841-2618-8064-abfa-c68c8616f6a6" class="">✅ <strong>지자체</strong><div class="indented"><ul id="192a0841-2618-80e7-b94a-cc425ee0422b" class="bulleted-list"><li style="list-style-type:disc">상권 개발 및 정책 지원 가능</li></ul></div></p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
